@@ -6,23 +6,16 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using LeagueSharp;
 
 namespace LeaguesharpStreamingMode
 {
     class Program
     {
-        static Assembly lib = Assembly.Load(LeaguesharpStreamingMode.Properties.Resources.LeaguesharpStreamingModelib); 
-        static void Main(string[] args)
-        {
-            SetUpOffsets();
-            Enable();
-
-            LeagueSharp.Game.OnWndProc += OnWndProc;
-            AppDomain.CurrentDomain.DomainUnload += delegate
-            {
-                Disable();
-            };
-        }
+        static Assembly lib = Assembly.Load(LeaguesharpStreamingMode.Properties.Resources.LeaguesharpStreamingModelib);
+        static string version = Game.Version[3] == '.' ? Game.Version.Substring(0, 3) : Game.Version.Substring(0, 4);
+        static Int32 LeaguesharpCore = GetModuleAddress("Leaguesharp.Core.dll");
+        static Dictionary<string, Int32[]> offsets;
 
         static Int32 GetModuleAddress(String ModuleName)
         {
@@ -36,7 +29,7 @@ namespace LeaguesharpStreamingMode
         static byte[] ReadMemory(Int32 address, Int32 length)
         {
             MethodInfo _ReadMemory = lib.GetType("LeaguesharpStreamingModelib.MemoryModule").GetMethods()[2];
-            return (byte[])_ReadMemory.Invoke(null, new object[] { address, length });  
+            return (byte[])_ReadMemory.Invoke(null, new object[] { address, length });
         }
 
         static void WriteMemory(Int32 address, byte value)
@@ -50,10 +43,6 @@ namespace LeaguesharpStreamingMode
             for (int i = 0; i < array.Length; i++)
                 WriteMemory(address + i, array[i]);
         }
-
-        static string version = LeagueSharp.Game.Version.Substring(0, 4);
-        static Int32 LeaguesharpCore = GetModuleAddress("Leaguesharp.Core.dll");
-        static Dictionary<string, Int32[]> offsets;
 
         enum functionOffset : int
         {
@@ -75,6 +64,7 @@ namespace LeaguesharpStreamingMode
             offsets.Add("4.19", new Int32[] { 0x5F40, 0x9B60, 0x9B40 });
             offsets.Add("4.20", new Int32[] { 0x6040, 0x9C00, 0x9BE0 });
             offsets.Add("4.21", new Int32[] { 0x6420, 0xA320, 0xA1B5 });
+            offsets.Add("5.1", new Int32[] { 0x6350, 0xA1A0, 0x0 });
         }
 
         static void Enable()
@@ -107,5 +97,18 @@ namespace LeaguesharpStreamingMode
                 }
             }
         }
+
+        static void Main(string[] args)
+        {
+            SetUpOffsets();
+            Enable();
+
+            LeagueSharp.Game.OnWndProc += OnWndProc;
+            AppDomain.CurrentDomain.DomainUnload += delegate
+            {
+               Disable();
+            };
+        }
+
     }
 }
