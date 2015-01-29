@@ -65,7 +65,7 @@ namespace LeaguesharpStreamingMode
             offsets.Add("4.20", new Int32[] { 0x6040, 0x9C00, 0x9BE0 });
             offsets.Add("4.21", new Int32[] { 0x6420, 0xA320, 0xA1B5 });
             offsets.Add("5.1", new Int32[] { 0x6440, 0xA290, 0x0 });
-            offsets.Add("5.2", new Int32[] { 0x1A790, 0x21CC0, 0x21C45 });
+            offsets.Add("5.2", new Int32[] { 0x1A790, 0x21CC0, 0x0 }); //0x21C45
         }
 
         static void Enable()
