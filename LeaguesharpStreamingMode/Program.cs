@@ -44,6 +44,28 @@ namespace LeaguesharpStreamingMode
                 WriteMemory(address + i, array[i]);
         }
 
+        static int SigScan(int start, int length, int[] pattern)
+        {
+            var buffer = ReadMemory(start, length);
+            for (int i = 0; i < buffer.Length - pattern.Length; i++)
+            {
+                if ((int)buffer[i] == pattern[0])
+                {
+                    for (int i2 = 0; i2 < pattern.Length; i2++)
+                    {
+                        if (pattern[i2] != -1)
+                        {
+                            if ((int)buffer[i + i2] != pattern[i2])
+                                break;
+                            if (i2 == pattern.Length - 1)
+                                return i;
+                        }
+                    }
+                }
+            }
+            return -1;
+        }
+
         enum functionOffset : int
         {
             drawEvent = 0,
@@ -61,12 +83,18 @@ namespace LeaguesharpStreamingMode
         static void SetUpOffsets()
         {
             offsets = new Dictionary<string, Int32[]>();
-            offsets.Add("4.19", new Int32[] { 0x5F40, 0x9B60, 0x9B40 });
-            offsets.Add("4.20", new Int32[] { 0x6040, 0x9C00, 0x9BE0 });
-            offsets.Add("4.21", new Int32[] { 0x6420, 0xA320, 0xA1B5 });
-            offsets.Add("5.1", new Int32[] { 0x6440, 0xA290, 0x0 });
-            offsets.Add("5.2", new Int32[] { 0x1A800, 0x21D20, 0x21CA0 });
-            offsets.Add("5.3", new Int32[] { 0x1A900, 0x21E90, 0x21E15 });
+            int[] pattern1 = { 0x55, 0x8B, 0xEC, 0x6A, 0xFF, 0x68, -1, -1, -1, -1, 0x64, 0xA1, 0, 0, 0, 0, 0x50, 0x83, 0xEC, 0x0C, 0x56, 0xA1, -1, -1, -1, -1, 0x33, 0xC5 };
+            int[] pattern2 = { 0x55, 0x8B, 0xEC, 0x8D, 0x45, 0x14, 0x50 };
+            var result1 = SigScan(LeaguesharpCore, 300000, pattern1);
+            var result2 = SigScan(LeaguesharpCore, 300000, pattern2);
+            offsets.Add(version, new Int32[] { result1, result2, result2 - 0x7B });
+
+            //offsets.Add("4.19", new Int32[] { 0x5F40, 0x9B60, 0x9B40 });
+            //offsets.Add("4.20", new Int32[] { 0x6040, 0x9C00, 0x9BE0 });
+            //offsets.Add("4.21", new Int32[] { 0x6420, 0xA320, 0xA1B5 });
+            //offsets.Add("5.1", new Int32[] { 0x6440, 0xA290, 0x0 });
+            //offsets.Add("5.2", new Int32[] { 0x1A800, 0x21D20, 0x21CA0 });
+            //offsets.Add("5.3", new Int32[] { 0x1A900, 0x21E90, 0x21E15 });
         }
 
         static void Enable()
@@ -103,17 +131,12 @@ namespace LeaguesharpStreamingMode
         static void Main(string[] args)
         {
             SetUpOffsets();
-            if (!offsets.ContainsKey(version))
-            {
-                Console.WriteLine(">> Streaming mode is outdated.");  
-                return;
-            }
             Enable();
 
             LeagueSharp.Game.OnWndProc += OnWndProc;
             AppDomain.CurrentDomain.DomainUnload += delegate
             {
-               Disable();
+                Disable();
             };
         }
 
