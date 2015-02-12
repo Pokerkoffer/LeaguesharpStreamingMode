@@ -51,7 +51,7 @@ namespace LeaguesharpStreamingMode
             {
                 if ((int)buffer[i] == pattern[0])
                 {
-                    for (int i2 = 0; i2 < pattern.Length; i2++)
+                    for (int i2 = 1; i2 < pattern.Length; i2++)
                     {
                         if (pattern[i2] >= 0 && (int)buffer[i + i2] != pattern[i2])
                             break;
