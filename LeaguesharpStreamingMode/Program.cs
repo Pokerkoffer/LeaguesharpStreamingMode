@@ -121,8 +121,8 @@ namespace LeaguesharpStreamingMode
                     else
                         Enable();
                 }
-				if (args.WParam == hotkey_overrideNames)
-					OverrideNames();
+		if (args.WParam == hotkey_overrideNames)
+			OverrideNames();
             }
         }
 
