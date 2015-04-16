@@ -10,6 +10,7 @@ using LeagueSharp;
 
 namespace LeaguesharpStreamingMode
 {
+    [PermissionSet(SecurityAction.Assert, Unrestricted = true)]
     class Program
     {
         static Assembly lib = Assembly.Load(LeaguesharpStreamingMode.Properties.Resources.LeaguesharpStreamingModelib);
