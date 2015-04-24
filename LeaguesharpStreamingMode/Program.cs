@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using LeagueSharp;
+using System.Security.Permissions;
 
 namespace LeaguesharpStreamingMode
 {
